@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Implementation Plan</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: white;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            width: 1600px;
+            background: white;
+            position: relative;
+            padding: 25px 30px;
+        }
+        .title {
+            text-align: center;
+            font-size: 52px;
+            font-weight: 800;
+            color: #1a3a5c;
+            margin-bottom: 10px;
+            font-family: 'Georgia', serif;
+        }
+        .timeline-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 85%;
+            margin: 0 auto 15px;
+        }
+        .timeline-wrapper .line {
+            flex: 1;
+            height: 3.5px;
+            background: #1a6b8a;
+        }
+        .phases-container {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .phase-card {
+            border: 2.5px solid #1a6b8a;
+            border-radius: 20px;
+            padding: 16px 12px;
+            position: relative;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .phase-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1a3a5c;
+            margin-top: 40px;
+            margin-bottom: 2px;
+            line-height: 1.3;
+        }
+        .phase-duration {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1a6b8a;
+            margin-bottom: 8px;
+        }
+        .phase-description {
+            font-size: 12px;
+            color: #333;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+        .needed-section {
+            margin-top: 12px;
+            padding-top: 8px;
+        }
+        .needed-title {
+            font-size: 11.5px;
+            font-weight: 700;
+            color: #1a3a5c;
+            margin-bottom: 3px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .needed-title .icon {
+            font-size: 13px;
+        }
+        .needed-text {
+            font-size: 11px;
+            color: #333;
+            line-height: 1.4;
+        }
+        .icon-placeholder {
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .platform-logos {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 6px 0;
+            align-items: flex-end;
+        }
+        .platform-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+        .platform-item .logo {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .platform-item .label {
+            font-size: 8.5px;
+            color: #444;
+            text-align: center;
+            max-width: 50px;
+        }
+
+        /* Attribution sub-phases section */
+        .attribution-wrapper {
+            position: relative;
+            flex: 2.8;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .attribution-main-card {
+            border: 2.5px solid #1a6b8a;
+            border-radius: 20px;
+            padding: 16px 14px;
+            position: relative;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .attribution-connector {
+            width: 3px;
+            height: 20px;
+            background: #1a3a5c;
+            margin: 0 auto;
+        }
+        .sub-phases-container {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            margin-top: 0;
+        }
+        .sub-phase-card {
+            border: 2px solid #5a8a9a;
+            border-radius: 14px;
+            padding: 12px 10px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #f8fbfc;
+            position: relative;
+        }
+        .sub-phase-badge {
+            background: #5a8a9a;
+            color: white;
+            font-size: 9px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 10px;
+            display: inline-block;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            width: fit-content;
+        }
+        .sub-phase-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: #1a3a5c;
+            margin-bottom: 2px;
+            line-height: 1.3;
+            text-transform: uppercase;
+        }
+        .sub-phase-duration {
+            font-size: 10px;
+            font-weight: 600;
+            color: #1a6b8a;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+        .sub-phase-icon {
+            width: 40px;
+            height: 40px;
+            margin: 4px auto 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .sub-phase-text {
+            font-size: 10px;
+            color: #333;
+            line-height: 1.35;
+        }
+        .sub-phase-text strong {
+            color: #1a3a5c;
+        }
+
+        /* Connector lines between sub-phases */
+        .sub-phases-container .sub-phase-card:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            right: -10px;
+            top: 50%;
+            width: 10px;
+            height: 2.5px;
+            background: #5a8a9a;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Title -->
+        <h1 class="title">Implementation Plan</h1>
+
+        <!-- Timeline -->
+        <div style="text-align:center; margin: 5px 0 5px;">
+            <span style="font-size: 44px; font-weight: 700; color: #1a3a5c;">16-18 Weeks</span>
+        </div>
+        <div class="timeline-wrapper">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="#1a6b8a">
+                <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+            </svg>
+            <div class="line"></div>
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="#1a6b8a" style="margin-left:-5px;">
+                <path d="M6.41 6L5 7.41 9.58 12 5 16.59 6.41 18l6-6z"/>
+                <path d="M12.41 6L11 7.41 15.58 12 11 16.59 12.41 18l6-6z"/>
+            </svg>
+        </div>
+
+        <!-- Phases -->
+        <div class="phases-container">
+            <!-- Phase 1 -->
+            <div class="phase-card" style="position: relative;">
+                <div class="icon-placeholder">
+                    <svg width="70" height="60" viewBox="0 0 64 54">
+                        <rect x="5" y="20" width="54" height="30" rx="3" fill="#2d8a8a" opacity="0.7"/>
+                        <rect x="10" y="14" width="54" height="30" rx="3" fill="#1a6b8a" opacity="0.8"/>
+                        <rect x="15" y="8" width="54" height="30" rx="3" fill="#1a5070" opacity="0.9"/>
+                        <circle cx="25" cy="18" r="2" fill="#5bc0be"/>
+                        <circle cx="32" cy="18" r="2" fill="#5bc0be"/>
+                        <rect x="20" y="24" width="40" height="2" fill="#5bc0be" opacity="0.5"/>
+                        <rect x="20" y="29" width="35" height="2" fill="#5bc0be" opacity="0.5"/>
+                    </svg>
+                </div>
+                <div class="phase-title">Phase 1 - Paid Media - API Based</div>
+                <div class="phase-duration">1 Week</div>
+
+                <div class="platform-logos">
+                    <div class="platform-item">
+                        <div class="logo">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="#0077B5">
+                                <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/>
+                            </svg>
+                        </div>
+                        <span class="label">Linkedin</span>
+                    </div>
+                    <div class="platform-item">
+                        <div class="logo">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="#0081FB">
+                                <path d="M12 2C6.477 2 2 6.477 2 12c0 5.013 3.693 9.153 8.505 9.876V14.65H8.031v-2.629h2.474v-1.749c0-2.896 1.411-4.167 3.818-4.167 1.153 0 1.762.086 2.051.124v2.294h-1.642c-1.022 0-1.379.969-1.379 2.061v1.437h2.995l-.406 2.629h-2.588v7.247C18.235 21.236 22 17.062 22 12c0-5.523-4.477-10-10-10z"/>
+                            </svg>
+                        </div>
+                        <span class="label">Meta</span>
+                    </div>
+                    <div class="platform-item">
+                        <div class="logo">
+                            <svg width="22" height="22" viewBox="0 0 24 24">
+                                <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12s4.477 10 10 10 10-4.477 10-10z" fill="none" stroke="#E37400" stroke-width="2"/>
+                                <path d="M12 6v6l4 2" fill="none" stroke="#E37400" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <span class="label">GA4</span>
+                    </div>
+                    <div class="platform-item">
+                        <div class="logo">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="#4285F4">
+                                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"/>
+                                <path d="M20.71 5.63l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83a1 1 0 0 0 0-1.41z"/>
+                            </svg>
+                        </div>
+                        <span class="label">Google ABs</span>
+                    </div>
+                </div>
+                <div style="margin: 4px 0;">
+                    <div class="platform-item">
+                        <div class="logo">
+                            <svg width="22" height="22" viewBox="0 0 24 24">
+                                <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="#4285F4"/>
+                            </svg>
+                        </div>
+                        <span class="label">Google Search Console</span>
+                    </div>
+                </div>
+
+                <div class="needed-section">
+                    <div class="needed-title"><span class="icon">&#128100;</span> Needed:</div>
+                    <div class="needed-text">Users with credentials for the platforms above who can authenticate connections</div>
+                </div>
+            </div>
+
+            <!-- Phase 2 -->
+            <div class="phase-card" style="position: relative;">
+                <div class="icon-placeholder">
+                    <svg width="70" height="60" viewBox="0 0 64 54">
+                        <circle cx="32" cy="25" r="8" fill="#1a6b8a" opacity="0.8"/>
+                        <circle cx="16" cy="35" r="6" fill="#2d8a8a" opacity="0.7"/>
+                        <circle cx="48" cy="35" r="6" fill="#2d8a8a" opacity="0.7"/>
+                        <circle cx="22" cy="15" r="5" fill="#5bc0be" opacity="0.6"/>
+                        <circle cx="42" cy="15" r="5" fill="#5bc0be" opacity="0.6"/>
+                        <line x1="32" y1="25" x2="16" y2="35" stroke="#1a5070" stroke-width="1.5"/>
+                        <line x1="32" y1="25" x2="48" y2="35" stroke="#1a5070" stroke-width="1.5"/>
+                        <line x1="32" y1="25" x2="22" y2="15" stroke="#1a5070" stroke-width="1.5"/>
+                        <line x1="32" y1="25" x2="42" y2="15" stroke="#1a5070" stroke-width="1.5"/>
+                    </svg>
+                </div>
+                <div class="phase-title">Phase 2 - Paid Media - Total Connect</div>
+                <div class="phase-duration">3 Weeks</div>
+
+                <div class="platform-logos">
+                    <div class="platform-item">
+                        <div class="logo"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" fill="none" stroke="#6B2D8A" stroke-width="2"/></svg></div>
+                        <span class="label">Vuello</span>
+                    </div>
+                    <div class="platform-item">
+                        <div class="logo"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" fill="#1a6b8a"/></svg></div>
+                        <span class="label">Pulsar</span>
+                    </div>
+                    <div class="platform-item">
+                        <div class="logo"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6h-6z" fill="#E91E63"/></svg></div>
+                        <span class="label">Alivue</span>
+                    </div>
+                </div>
+                <div class="platform-logos" style="margin-top: 4px;">
+                    <div class="platform-item">
+                        <div class="logo"><svg width="22" height="22" viewBox="0 0 24 24"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" fill="#00B67A"/></svg></div>
+                        <span class="label">Trustplist</span>
+                    </div>
+                    <div class="platform-item">
+                        <div class="logo"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" fill="#1a6b8a"/></svg></div>
+                        <span class="label">Multiple Flat Files</span>
+                    </div>
+                </div>
+
+                <div class="needed-section">
+                    <div class="needed-title"><span class="icon">&#128101;</span> Needed:</div>
+                    <div class="needed-text">Users with an understanding of these data sources and their structures. Data Cloud Architect Permissions. Permissions to Storage and/or file transfer services</div>
+                </div>
+            </div>
+
+            <!-- Phase 3 - Enrichment/Calculated Fields -->
+            <div class="phase-card" style="position: relative;">
+                <div class="icon-placeholder">
+                    <svg width="70" height="60" viewBox="0 0 64 54">
+                        <rect x="10" y="10" width="44" height="35" rx="4" fill="#1a6b8a" opacity="0.2"/>
+                        <rect x="15" y="15" width="15" height="10" rx="2" fill="#1a6b8a" opacity="0.6"/>
+                        <rect x="35" y="15" width="15" height="10" rx="2" fill="#2d8a8a" opacity="0.6"/>
+                        <rect x="15" y="30" width="15" height="10" rx="2" fill="#5bc0be" opacity="0.6"/>
+                        <rect x="35" y="30" width="15" height="10" rx="2" fill="#1a5070" opacity="0.6"/>
+                        <circle cx="50" cy="10" r="8" fill="#E37400" opacity="0.8"/>
+                        <text x="50" y="14" text-anchor="middle" fill="white" font-size="10" font-weight="bold">?</text>
+                    </svg>
+                </div>
+                <div class="phase-title">Phase 3 - Enrichment/ Calculated Fields</div>
+                <div class="phase-duration">1 Week</div>
+
+                <div class="phase-description">Creating calculations on our SDM</div>
+
+                <div class="needed-section">
+                    <div class="needed-title"><span class="icon">&#128101;</span> Needed:</div>
+                    <div class="needed-text">Data Specialists - those who know your naming conventions, governance, have an opinion on the logic by which you want to group your campaigns</div>
+                </div>
+            </div>
+
+            <!-- Phase 4 - Attribution (with sub-phases below) -->
+            <div class="attribution-wrapper">
+                <div class="attribution-main-card" style="position: relative;">
+                    <div class="icon-placeholder">
+                        <svg width="70" height="60" viewBox="0 0 64 54">
+                            <circle cx="32" cy="27" r="16" fill="#1a6b8a" opacity="0.2"/>
+                            <path d="M20 30 L32 15 L44 30" fill="none" stroke="#1a6b8a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="32" cy="15" r="4" fill="#E37400"/>
+                            <circle cx="20" cy="30" r="3" fill="#2d8a8a"/>
+                            <circle cx="44" cy="30" r="3" fill="#2d8a8a"/>
+                            <line x1="20" y1="30" x2="44" y2="30" stroke="#5bc0be" stroke-width="1.5" stroke-dasharray="3,2"/>
+                            <path d="M28 38 L32 42 L36 38" fill="none" stroke="#1a3a5c" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <div class="phase-title">Phase 4 - Attribution</div>
+                    <div class="phase-duration">7-9 Weeks</div>
+                    <div class="phase-description">End-to-end attribution setup: SDK selection, implementation, MI configuration, and ongoing refinement.</div>
+                </div>
+
+                <!-- Vertical connector line -->
+                <div class="attribution-connector"></div>
+
+                <!-- Horizontal branch line + vertical drops -->
+                <div style="position: relative; width: 100%; height: 15px;">
+                    <div style="position: absolute; top: 0; left: 12.5%; right: 12.5%; height: 2.5px; background: #1a3a5c;"></div>
+                    <div style="position: absolute; top: 0; left: 12.5%; width: 2.5px; height: 15px; background: #1a3a5c;"></div>
+                    <div style="position: absolute; top: 0; left: 37.5%; width: 2.5px; height: 15px; background: #1a3a5c;"></div>
+                    <div style="position: absolute; top: 0; left: 62.5%; width: 2.5px; height: 15px; background: #1a3a5c;"></div>
+                    <div style="position: absolute; top: 0; right: 12.5%; width: 2.5px; height: 15px; background: #1a3a5c;"></div>
+                </div>
+
+                <!-- Sub-phases row -->
+                <div class="sub-phases-container">
+                    <!-- Sub-phase 1: SDK Implementation -->
+                    <div class="sub-phase-card">
+                        <span class="sub-phase-badge">Phase 1</span>
+                        <div class="sub-phase-title">SDK Implementation</div>
+                        <div class="sub-phase-duration">2-4 Weeks</div>
+                        <div class="sub-phase-icon">
+                            <svg width="36" height="36" viewBox="0 0 24 24">
+                                <rect x="3" y="3" width="18" height="18" rx="2" fill="none" stroke="#1a3a5c" stroke-width="1.5"/>
+                                <path d="M7 8l3 3-3 3M12 16h5" fill="none" stroke="#1a6b8a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div class="sub-phase-text">
+                            <strong>Action:</strong> Implementing SDK code snippets or GA4 Tag Management.<br>
+                            <strong>Needed:</strong> Website coders + other relevant technical personas.
+                        </div>
+                    </div>
+
+                    <!-- Sub-phase 2: Data360 Configuration -->
+                    <div class="sub-phase-card">
+                        <span class="sub-phase-badge">Phase 2</span>
+                        <div class="sub-phase-title">Data360 Configuration</div>
+                        <div class="sub-phase-duration">2 Weeks</div>
+                        <div class="sub-phase-icon">
+                            <svg width="36" height="36" viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="10" fill="none" stroke="#1a6b8a" stroke-width="1.5"/>
+                                <path d="M12 2 A10 10 0 0 1 22 12" fill="#1a6b8a" opacity="0.3"/>
+                                <path d="M8 12 L11 15 L16 9" fill="none" stroke="#2d8a2d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <text x="12" y="21" text-anchor="middle" fill="#1a3a5c" font-size="4" font-weight="bold">360</text>
+                            </svg>
+                        </div>
+                        <div class="sub-phase-text">
+                            <strong>Action:</strong> Mapping in D360 and defining Engagement Signals.<br>
+                            <strong>Needed:</strong> D360 Admin.
+                        </div>
+                    </div>
+
+                    <!-- Sub-phase 3: Configuration in MI -->
+                    <div class="sub-phase-card">
+                        <span class="sub-phase-badge">Phase 3</span>
+                        <div class="sub-phase-title">Configuration in MI</div>
+                        <div class="sub-phase-duration">2 Weeks</div>
+                        <div class="sub-phase-icon">
+                            <svg width="36" height="36" viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="9" fill="none" stroke="#555" stroke-width="1.5"/>
+                                <path d="M12 3a9 9 0 0 1 0 18" fill="#555" opacity="0.3"/>
+                                <circle cx="12" cy="12" r="3" fill="#555"/>
+                                <path d="M15 9l4-4M16 3h3v3" fill="none" stroke="#2d8a2d" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <div class="sub-phase-text">
+                            <strong>Action:</strong> Configuration of Engagement signals and Conversion Signals in MI.<br>
+                            <strong>Needed:</strong> Marketing Managers, Data Specialists.
+                        </div>
+                    </div>
+
+                    <!-- Sub-phase 4: Additional Tweaks -->
+                    <div class="sub-phase-card">
+                        <span class="sub-phase-badge">Phase 4</span>
+                        <div class="sub-phase-title">Additional Tweaks</div>
+                        <div class="sub-phase-duration">2 Weeks</div>
+                        <div class="sub-phase-icon">
+                            <svg width="36" height="36" viewBox="0 0 24 24">
+                                <rect x="2" y="6" width="9" height="12" rx="1" fill="none" stroke="#1a6b8a" stroke-width="1.5"/>
+                                <rect x="3.5" y="11" width="2" height="5.5" fill="#E37400"/>
+                                <rect x="6.5" y="9" width="2" height="7.5" fill="#2d8a8a"/>
+                                <rect x="13" y="6" width="9" height="12" rx="1" fill="none" stroke="#1a6b8a" stroke-width="1.5"/>
+                                <path d="M15 10l2 2 3-3" fill="none" stroke="#2d8a2d" stroke-width="1.5" stroke-linecap="round"/>
+                                <path d="M20 3l2 0M21 2l0 2" fill="none" stroke="#E37400" stroke-width="1.5" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <div class="sub-phase-text">
+                            <strong>Action:</strong> Working with the dashboards/Making customization to the dashboards.<br>
+                            <strong>Needed:</strong> Marketing Managers, Data Specialists.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Phase 5 - Salesforce Marketing Cloud -->
+            <div class="phase-card" style="position: relative;">
+                <div class="icon-placeholder">
+                    <svg width="70" height="60" viewBox="0 0 64 54">
+                        <ellipse cx="32" cy="30" rx="20" ry="12" fill="#1a6b8a" opacity="0.3"/>
+                        <path d="M25 25 Q32 10 39 25" fill="#1a6b8a" opacity="0.7"/>
+                        <circle cx="32" cy="20" r="10" fill="#5bc0be" opacity="0.4"/>
+                        <path d="M22 22 Q32 12 42 22 Q42 30 32 30 Q22 30 22 22Z" fill="#1a6b8a" opacity="0.6"/>
+                        <path d="M38 18 L42 14 L44 16" fill="none" stroke="#1a5070" stroke-width="2"/>
+                    </svg>
+                </div>
+                <div class="phase-title">Phase 5 - Salesforce Marketing Cloud</div>
+                <div class="phase-duration">1 Week</div>
+
+                <div class="phase-description">Marketing Cloud on Core SDM sync with MI</div>
+
+                <div class="needed-section">
+                    <div class="needed-title"><span class="icon">&#128100;</span> Needed:</div>
+                    <div class="needed-text">Marketing Cloud Admin</div>
+                </div>
+            </div>
+
+            <!-- Phase 6 - Custom Dashboards -->
+            <div class="phase-card" style="position: relative;">
+                <div class="icon-placeholder">
+                    <svg width="70" height="60" viewBox="0 0 64 54">
+                        <rect x="8" y="12" width="48" height="32" rx="3" fill="#1a6b8a" opacity="0.2"/>
+                        <rect x="12" y="16" width="20" height="24" rx="2" fill="#1a6b8a" opacity="0.6"/>
+                        <rect x="14" y="28" width="4" height="10" fill="#5bc0be"/>
+                        <rect x="20" y="24" width="4" height="14" fill="#2d8a8a"/>
+                        <rect x="26" y="20" width="4" height="18" fill="#1a5070"/>
+                        <rect x="36" y="16" width="16" height="24" rx="2" fill="#2d8a8a" opacity="0.4"/>
+                        <circle cx="44" cy="28" r="6" fill="none" stroke="#E37400" stroke-width="2"/>
+                        <path d="M41 28 L44 31 L48 25" fill="none" stroke="#E37400" stroke-width="1.5"/>
+                    </svg>
+                </div>
+                <div class="phase-title">Phase 6 - Custom Dashboards</div>
+                <div class="phase-duration">2 Weeks</div>
+
+                <div class="phase-description">Building Required Dashboards</div>
+
+                <div class="needed-section">
+                    <div class="needed-title"><span class="icon">&#128100;</span> Needed:</div>
+                    <div class="needed-text">Those who define how data is visualized and consumed</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
